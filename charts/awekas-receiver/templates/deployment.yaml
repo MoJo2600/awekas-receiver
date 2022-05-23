@@ -29,13 +29,62 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
+          env:
+          {{- if .Values.port }}
+          - name: 'PORT'
+            value: "{{ .Values.port }}"
+          {{- end}}
+          {{- if .Values.nodeEnv }}
+          - name: 'NODE_ENV'
+            value: "{{ .Values.nodeEnv }}"
+          {{- end}}
+          {{- if .Values.influxUrl }}
+          - name: 'INFLUX_URL'
+            value: "{{ .Values.influxUrl }}"
+          {{- end}}
+          {{- if .Values.influxToken }}
+          - name: 'INFLUX_TOKEN'
+            value: "{{ .Values.influxToken }}"
+          {{- end}}
+          {{- if .Values.influxOrg }}
+          - name: 'INFLUX_ORG'
+            value: "{{ .Values.influxOrg }}"
+          {{- end}}
+          {{- if .Values.influxBucket }}
+          - name: 'INFLUX_BUCKET'
+            value: "{{ .Values.influxBucket }}"
+          {{- end}}
+          {{- if .Values.rateLimitMaxRequests }}
+          - name: 'RATE_LIMIT_MAX_REQUESTS'
+            value: "{{ .Values.rateLimitMaxRequests }}"
+          {{- end}}
+          {{- if .Values.rateLimitWindowMinutes }}
+          - name: 'RATE_LIMIT_WINDOW_MINUTES'
+            value: "{{ .Values.rateLimitWindowMinutes }}"
+          {{- end}}
+          {{- if .Values.rateLimitDelaySeconds }}
+          - name: 'RATE_LIMIT_DELAY_SECONDS'
+            value: "{{ .Values.rateLimitDelaySeconds }}"
+          {{- end}}
+          {{- if .Values.hashSalt }}
+          - name: 'HASH_SALT'
+            value: "{{ .Values.hashSalt }}"
+          {{- end}}
+          {{- if .Values.enabledUsers }}
+          - name: 'ENABLED_USERS'
+            value: "{{ .Values.enabledUsers }}"
+          {{- end}}
+          {{- range $key, $value := .Values.extraEnvVars }}
+          - name: {{ $key | quote }}
+            value: {{ $value | quote }}
+          {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 3000
               protocol: TCP
           livenessProbe:
             httpGet:
